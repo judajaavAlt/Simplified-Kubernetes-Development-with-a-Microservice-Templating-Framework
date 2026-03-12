@@ -1,0 +1,57 @@
+name: PR Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Detect tests changed in PR
+        id: changed-tests
+        run: |
+          FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep -E '^tests/.*test_.*\.py$' || true)
+
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+
+          echo "=============================="
+          if [ -z "$FILES" ]; then
+            echo "No modified tests detected in this PR"
+          else
+            echo "Tests modified in this PR:"
+            echo "$FILES"
+          fi
+          echo "=============================="
+
+      - name: Run changed tests (fail fast)
+        if: steps.changed-tests.outputs.files != ''
+        run: |
+          echo "Running modified tests..."
+          pytest ${{ steps.changed-tests.outputs.files }} -vv --maxfail=1 --tb=short
+
+      - name: Run smoke tests (fail fast)
+        run: |
+          echo "Running smoke tests..."
+          pytest -m smoke -vv --maxfail=1 --tb=short

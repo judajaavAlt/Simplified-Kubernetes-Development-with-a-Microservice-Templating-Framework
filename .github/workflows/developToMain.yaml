@@ -1,0 +1,36 @@
+name: Full Test Suite
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  full-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Show test discovery
+        run: |
+          echo "================================="
+          echo "Running full pytest suite"
+          echo "Tests folder contents:"
+          ls -R tests
+          echo "================================="
+
+      - name: Run all tests (fail fast)
+        run: |
+          pytest tests -vv --maxfail=1 --tb=short
