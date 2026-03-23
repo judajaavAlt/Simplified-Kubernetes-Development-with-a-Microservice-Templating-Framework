@@ -1,0 +1,11 @@
+{
+    "prueba": 
+    {
+        "args": ["value"],
+        "flags": 
+        [
+            {"flag": ["-f", "--file"], "name": "file"},
+            {"flag": ["-r", "--read"], "name": "read"}
+        ]
+    }
+}
