@@ -26,7 +26,8 @@ extensions = [
 add_module_names = False
 templates_path = ['_templates']
 exclude_patterns = []
-
+autodoc_member_order = "bysource"
+autodoc_inherit_docstrings = False
 
 
 # -- Options for HTML output -------------------------------------------------
