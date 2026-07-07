@@ -1,4 +1,4 @@
-{
+COMMANDS = {
     "prueba": 
     {
         "args": ["value"],

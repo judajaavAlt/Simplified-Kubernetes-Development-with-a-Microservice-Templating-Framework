@@ -31,32 +31,25 @@ Raises:
     Exception: If the command is invalid, incomplete, or contains unknown/repeated flags.
 """
 
-import json
 from cli.constants.status import (
     ParseError
 )
-from pathlib import Path
+from cli.constants.commands import COMMANDS
 
 
 def get_commands() -> dict:
     """
-    Load available command definitions from the configuration file.
+    Retrieve the available command definitions.
 
-    Reads the `commands.JSON` file located in the same directory as this
-    module and returns its contents as a dictionary.
+    Returns the command configuration stored in the application's
+    constants module. Each command definition contains its expected
+    arguments and supported flags.
 
     Returns:
-        dict: A dictionary where keys are command names and values contain
-            their argument and flag definitions.
-
-    Raises:
-        FileNotFoundError: If the `commands.JSON` file does not exist.
-        json.JSONDecodeError: If the file contents are not valid JSON.
+        dict: A dictionary where keys are command names and values
+            contain their argument and flag definitions.
     """
-    path = Path(__file__).parent / "commands.JSON"
-
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return COMMANDS
 
 
 def parse_command(command: list[str]) -> dict[str, str]:
@@ -121,7 +114,7 @@ def get_command(command: list[str],
     Raises:
         Exception: If no command is provided or if the command is unknown.
     """
-    if len(command) == 0:
+    if len(command) == 0 or command is None:
         raise Exception(f"[Error {ParseError.NO_COMMAND}] "
                         "NO_COMMAND: No command was defined")
 
@@ -215,7 +208,7 @@ def get_flags(command: list[str], flags) -> str:
             command_flags[value[command[i]]] = command[i + 1]
         except IndexError:
             print(f"[Error {ParseError.FLAG_WITHOUT_VALUE}] "
-                    "FLAG_WITHOUT_VALUE: there wasn't a value "
-                    f"assigned for {command[i]} flag")
+                  "FLAG_WITHOUT_VALUE: there wasn't a value "
+                  f"assigned for {command[i]} flag")
 
     return command_flags
